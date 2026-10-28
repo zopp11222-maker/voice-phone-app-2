@@ -1,0 +1,33 @@
+name: Build APK from Zip
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Unzip project
+        run: |
+          unzip VoicePhoneApp.zip -d project_folder
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Build with Gradle
+        run: |
+          cd project_folder/VoicePhoneApp
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: project_folder/VoicePhoneApp/app/build/outputs/apk/debug/app-debug.apk
+          
